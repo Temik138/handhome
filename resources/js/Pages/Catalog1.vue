@@ -9,7 +9,7 @@
                     :href="`/products/${product.id}`"
                     class="product-card"
                 >
-                    <img class="product-image" :src="`/storage/${product.image}`">
+                    <img class="product-image" :src="`/images/${product.image}`">
                     <div class="title">{{ product.name }}</div>
                     <div class="price">{{ product.price }}р</div>
                 </Link>

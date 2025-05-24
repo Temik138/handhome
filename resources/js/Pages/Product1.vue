@@ -1,159 +1,70 @@
 <template>
-  <section class="main-section">
-    <div class="product-container">
-      <div class="image-section" v-if="processedProduct && processedProduct.images">
-        <div class="thumbnail-gallery">
-          <img
-            v-for="(image, index) in processedProduct.images"
-            :key="index"
-            :src="getImageUrl(image)"
-            alt=""
-            class="thumbnail"
-            :class="{ active: currentImageIndex === index }"
-            @click="changeImage(index)"
-          />
+    <section class="main-section">
+        <div class="product-detail-container">
+            <div v-if="productData" class="product-card-detail">
+                <div class="image-gallery">
+                    <img v-if="mainImage" :src="`/images/${mainImage}`" :alt="productData.name" class="main-product-image">
+                    <div class="thumbnail-row">
+                        <img
+                            v-for="(img, index) in productData.images"
+                            :key="index"
+                            :src="`/images/${img}`"
+                            @click="setMainImage(img)"
+                            :class="['thumbnail', { 'active-thumbnail': mainImage === img }]"
+                            alt="Product thumbnail"
+                        />
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h1 class="title-detail">{{ productData.name }}</h1>
+                    <p class="description">{{ productData.description }}</p>
+                    <div class="price-detail">{{ productData.price }}р</div>
+                    <button class="add-to-cart-button">Добавить в корзину</button>
+                    </div>
+            </div>
+            <div v-else class="loading-message">
+                Загрузка информации о товаре...
+            </div>
         </div>
-        <img
-          :src="currentImage" 
-          alt="Product main image"
-          class="main-image"
-          v-if="currentImage"
-        />
-      </div>
-
-      <div class="product-details" v-if="processedProduct">
-        <h2 class="product-title">{{ processedProduct.name }}</h2>
-        <p class="product-description">
-          {{ processedProduct.description }}
-        </p>
-        <div class="purchase-section">
-          <span class="price">{{ processedProduct.price }} рублей</span>
-          <div class="quantity-controls">
-            <button class="quantity-btn" @click="decreaseQuantity">-</button>
-            <span class="quantity">{{ quantity }}</span>
-            <button class="quantity-btn" @click="increaseQuantity">+</button>
-          </div>
-          <button class="buy-button" @click="addToCart">Купить</button>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 </template>
-  
-  <script>
-  export default {
-  name: 'AppProduct1',
- props: {
-  productData: {
-    type: Object,
-    default: () => ({
-      id: undefined,
-      name: 'Информация о товаре',
-      description: 'Описание загружается...',
-      price: 0,
-      images: [],
-      image: ''
-    })
-  }
-},
-  data() {
-    return {
-      currentImageIndex: 0,
-      quantity: 1
-    }
-  },
-  computed: {
-    processedProduct() {
-      // Логируем полученные productData в консоль браузера
-      console.log('AppProduct1.vue - Received productData:', JSON.parse(JSON.stringify(this.productData)));
 
-      if (!this.productData || this.productData.id === undefined) {
-        console.error('AppProduct1.vue - productData is missing or has no id. Displaying fallback.');
+<script>
+export default {
+    props: {
+        productData: {
+            type: Object,
+            required: true,
+            default: () => ({})
+        }
+    },
+    data() {
         return {
-          name: 'Товар не найден',
-          description: 'К сожалению, информация о данном товаре отсутствует или товар был удален.',
-          price: 0,
-          images: [],
-          image: '', // Можно указать путь к картинке "изображение не найдено"
+            mainImage: this.productData.image || (this.productData.images && this.productData.images.length > 0 ? this.productData.images[0] : null)
         };
-      }
-
-      let imagesToShow = this.productData.images;
-
-      if ((!imagesToShow || imagesToShow.length === 0) && this.productData.image) {
-        imagesToShow = [this.productData.image];
-      }
-      
-      return {
-        ...this.productData,
-        images: imagesToShow || [],
-      };
     },
-    currentImage() {
-      if (!this.processedProduct || !this.processedProduct.images || this.processedProduct.images.length === 0) {
-        // Если галерея пуста, пытаемся показать основное изображение из processedProduct.image
-        // или изображение по умолчанию, если и его нет
-        return this.getImageUrl(this.processedProduct.image || null); 
-      }
-      // Убедимся, что currentImageIndex не выходит за пределы массива
-      const imagePath = this.processedProduct.images[this.currentImageIndex];
-      return this.getImageUrl(imagePath);
+    watch: {
+        // Следим за изменением productData и обновляем основное изображение
+        productData: {
+            handler(newVal) {
+                if (newVal) {
+                    this.mainImage = newVal.image || (newVal.images && newVal.images.length > 0 ? newVal.images[0] : null);
+                }
+            },
+            deep: true,
+            immediate: true
+        }
+    },
+    methods: {
+        setMainImage(image) {
+            this.mainImage = image;
+        }
     }
-  },
-  created() {
-    // Сбрасываем индекс при загрузке/обновлении данных, если есть изображения
-    if (this.processedProduct && this.processedProduct.images && this.processedProduct.images.length > 0) {
-      this.currentImageIndex = 0;
-    }
-    // Можно добавить дополнительную проверку или логику здесь при необходимости
-    // console.log('AppProduct1.vue - Component created. Processed product name:', this.processedProduct.name);
-  },
-  watch: {
-    // Если вы переходите между страницами товаров без полной перезагрузки страницы
-    // (например, по ссылкам "похожие товары" на этой же странице компонента),
-    // то нужно отслеживать изменения productData.id или всего productData
-    'productData.id'(newId, oldId) {
-      if (newId !== oldId) {
-        // console.log(`Product ID changed from ${oldId} to ${newId}. Resetting component state.`);
-        this.currentImageIndex = 0;
-        this.quantity = 1;
-        // Дополнительные сбросы состояния, если нужны
-      }
-    }
-  },
-  methods: {
-    getImageUrl(imagePath) {
-      if (!imagePath) return '/images/'; 
-      if (imagePath.startsWith('http')) return imagePath;
-      return `/storage/${imagePath}`;
-    },
-    changeImage(index) {
-      if (this.processedProduct?.images?.length > index && index >= 0) { // Добавил index >= 0
-        this.currentImageIndex = index;
-      }
-    },
-    increaseQuantity() {
-      this.quantity++;
-    },
-    decreaseQuantity() {
-      if (this.quantity > 1) {
-        this.quantity--;
-      }
-    },
-    addToCart() {
-      // Убедимся, что processedProduct существует и у него есть имя
-      if (this.processedProduct && this.processedProduct.id !== undefined) {
-        alert(`Добавлено в корзину: ${this.processedProduct.name} (${this.quantity} шт.)`);
-      } else {
-        alert('Невозможно добавить товар в корзину, товар не найден.');
-      }
-    }
-  }
 }
-  </script>
-  <style scoped>
-  /* Ваши существующие стили без изменений */
-  .main-section {
+</script>
+
+<style scoped>
+.main-section {
     color: white;
     font-family: "Montserrat";
     width: 100%;
@@ -162,157 +73,152 @@
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    align-items: center;
-    background-color: #884535;
-  }
-  
-  .product-container {
+    align-items: flex-start; /* Изменено на flex-start, чтобы контент был сверху */
+    padding-top: 50px; /* Отступ сверху */
+}
+
+.product-detail-container {
+    max-width: 1200px;
+    width: 100%;
+    background-color: #2c2c2c; /* Цвет фона для контейнера деталей товара */
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product-card-detail {
     display: flex;
-    max-width: 800px;
+    flex-wrap: wrap; /* Для адаптивности на маленьких экранах */
     gap: 40px;
-    align-items: center;
-  }
-  
-  .image-section {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .thumbnail-gallery {
+    justify-content: center; /* Центрирование содержимого */
+}
+
+.image-gallery {
+    flex: 1;
+    min-width: 300px; /* Минимальная ширина для галереи изображений */
+    max-width: 500px; /* Максимальная ширина */
     display: flex;
     flex-direction: column;
-    gap: 15px;
-  }
-  
-  .thumbnail {
+    align-items: center;
+}
+
+.main-product-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px; /* Ограничение высоты для основного изображения */
+    object-fit: contain; /* Чтобы изображение полностью помещалось */
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #444;
+}
+
+.thumbnail-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto; /* Прокрутка для миниатюр, если их много */
+    padding-bottom: 5px; /* Отступ для скроллбара */
+}
+
+.thumbnail {
     width: 80px;
-    height: 120px;
+    height: 80px;
     object-fit: cover;
+    border-radius: 5px;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: all 0.3s;
-    border-radius: 5px;
-  }
-  
-  .thumbnail:hover {
-    transform: scale(1.05);
-  }
-  
-  .thumbnail.active {
-    border-color: #884535;
-    transform: scale(1.1);
-  }
-  
-  .main-image {
-    width: 350px;
-    height: 500px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .product-details {
-    font-family: "Montserrat", sans-serif;
-    color: white;
-    max-width: 400px;
-  }
-  
-  .product-title {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 20px;
-  }
-  
-  .product-description {
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 30px;
-  }
-  
-  .purchase-section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .price {
-    font-size: 24px;
-    font-weight: 600;
-  }
-  
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    transition: all 0.2s ease;
+}
+
+.thumbnail:hover {
+    border-color: #ffd700;
+}
+
+.active-thumbnail {
+    border-color: #ffd700;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.product-info {
+    flex: 2;
+    min-width: 300px; /* Минимальная ширина для информации о товаре */
+    padding-left: 20px;
+    border-left: 1px dashed #555; /* Разделитель */
+}
+
+.title-detail {
+    font-size: 36px;
     margin-bottom: 15px;
-  }
-  
-  .quantity-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #884535;
-    border: 2px dashed white;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-  }
-  
-  .quantity-btn:hover {
-    background-color: #6d3626;
-  }
-  
-  .quantity {
-    font-size: 20px;
-    min-width: 30px;
-    text-align: center;
-  }
-  
-  .buy-button {
-    border-radius: 5px;
-    background-color: #884535;
-    border: 2px dashed white;
-    padding: 15px 40px;
+    color: #ffd700;
+}
+
+.description {
     font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #e0e0e0;
+}
+
+.price-detail {
+    font-size: 30px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 30px;
+}
+
+.add-to-cart-button {
+    background-color: #884535;
     color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
     cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-  }
-  
-  .buy-button:hover {
-    background-color: #6d3626;
-    transform: translateY(-2px);
-  }
-  
-  @media (max-width: 768px) {
-    .product-container {
-      flex-direction: column;
-      padding: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+    background-color: #a05e4a;
+}
+
+.loading-message {
+    text-align: center;
+    font-size: 24px;
+    color: #ccc;
+    padding: 50px;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 900px) {
+    .product-card-detail {
+        flex-direction: column;
+        align-items: center;
     }
-    
-    .image-section {
-      flex-direction: column-reverse;
-      align-items: center;
+
+    .image-gallery, .product-info {
+        min-width: unset;
+        width: 100%;
+        padding-left: 0;
+        border-left: none;
     }
-    
-    .thumbnail-gallery {
-      flex-direction: row;
-      margin-top: 20px;
+
+    .product-info {
+        text-align: center;
+        padding-top: 30px;
+        border-top: 1px dashed #555; /* Разделитель сверху для мобильных */
     }
-    
-    .main-image {
-      width: 100%;
-      height: auto;
-      max-height: 400px;
+
+    .title-detail {
+        font-size: 28px;
     }
-    
-    .product-details {
-      max-width: 100%;
+
+    .price-detail {
+        font-size: 24px;
     }
-  }
-  </style>
+}
+
+@media (max-width: 600px) {
+    .product-detail-container {
+        padding: 20px;
+    }
+}
+</style>

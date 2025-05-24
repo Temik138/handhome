@@ -23,7 +23,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Курс по js',
                 'description' => 'Полный курс по js',
                 'price' => 500,
-                'image' => 'kursreact.webp',
+                'image' => 'kursjs.webp',
                 'images' => json_encode(['kursjs.webp', 'kursjs.webp']),
                 'category' => 'kurs',
                 'is_popular' => true
@@ -32,7 +32,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Книга Гарри Поттер',
                 'description' => 'Полный курс по React.js',
                 'price' => 480,
-                'image' => 'kursreact.webp',
+                'image' => 'garry.webp',
                 'images' => json_encode(['garry.webp', 'garry2.webp']),
                 'category' => 'books',
                 'is_popular' => true
@@ -41,7 +41,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Книга Властелин Колец',
                 'description' => 'Полный курс по React.js',
                 'price' => 420,
-                'image' => '/image/kursreact.webp',
+                'image' => 'kolec.webp',
                 'images' => json_encode(['kolec.webp', 'kolec2.webp']),
                 'category' => 'books',
                 'is_popular' => true
