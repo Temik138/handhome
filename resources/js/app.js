@@ -1,26 +1,27 @@
-// resources/js/app.js
-import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+import '../css/app.css';
+import './bootstrap';
+
+import { createInertiaApp } from '@inertiajs/vue3';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createApp, h } from 'vue';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/index.esm.js';
+
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-  resolve: (name) => {
-    // Проверяем доступные файлы
-    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-    console.log('Available pages:', Object.keys(pages))
-    
-    // Явно проверяем существование файла
-    const pagePath = `./Pages/${name}.vue`
-    if (!pages[pagePath]) {
-      console.error(`Page not found: ${pagePath}`)
-      throw new Error(`Page ${name} not found`)
-    }
-    
-    return pages[pagePath]
-  },
-  setup({ el, App, props, plugin }) {
-    return createApp({ render: () => h(App, props) })
-      .use(plugin)
-      .mount(el)
-  }
-})
+    title: (title) => `${title} - ${appName}`,
+    resolve: (name) =>
+        resolvePageComponent(
+            `./Pages/${name}.vue`,
+            import.meta.glob('./Pages/**/*.vue'),
+        ),
+    setup({ el, App, props, plugin }) {
+        return createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .use(ZiggyVue, Ziggy)
+            .mount(el);
+    },
+    progress: {
+        color: '#4B5563',
+    },
+});

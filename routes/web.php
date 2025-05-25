@@ -1,28 +1,32 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProfileController;
+use Inertia\Inertia;
 
-
-// Главная страница — твоя кастомная Home.vue
 Route::get('/', [ProductController::class, 'home'])->name('home');
+Route::get('/catalog', [ProductController::class, 'index'])->name('catalog');
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.show');
 
-Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+// Маршруты для корзины - доступны всем
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->middleware('auth')->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
-
-Route::get('/catalog', [ProductController::class, 'index'])->name('Catalog');
-// Страница dashboard — доступна только авторизованным и подтверждённым
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-// Профиль и его маршруты
-Route::middleware('auth')->group(function () {
+// Маршруты, требующие аутентификации
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard'); 
+    })->name('dashboard');
+    // Пример: Страница профиля (из Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 });
 
+// Маршруты аутентификации, генерируемые Breeze
 require __DIR__.'/auth.php';
