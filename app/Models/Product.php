@@ -16,7 +16,6 @@ class Product extends Model
         'image',
         'images', // Добавьте images в fillable
         'category',
-        'is_popular',
     ];
 
     protected $casts = [

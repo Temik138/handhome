@@ -5,12 +5,13 @@
     <Link href="/cart" class="cart">корзина</Link>
 
     <template v-if="$page.props.auth.user">
-      <Link :href="route('profile.edit')" class="profile-link">
-        Привет, {{ $page.props.auth.user.name }}!
-      </Link>
       <Link :href="route('logout')" method="post" as="button" class="logout-button">
         Выход
       </Link>
+      <Link :href="route('profile.edit')" class="profile-link">
+        Привет, {{ $page.props.auth.user.name }}!
+      </Link>
+      
     </template>
     <template v-else>
       <Link :href="route('login')" class="login">вход</Link>
@@ -95,12 +96,12 @@ export default {
 
 /* Стили для ссылок авторизованного пользователя */
 .profile-link {
-    margin: 50px 0 0 auto; /* Автоматический отступ, чтобы ссылки прибились вправо */
-    margin-right: 20px; /* Отступ от кнопки выхода */
+    margin: 50px 0 0 ; /* Автоматический отступ, чтобы ссылки прибились вправо */
+    /* Отступ от кнопки выхода */
 }
 
 .logout-button {
-    margin: 50px 150px 0 0; /* Отступ справа от кнопки выхода */
+    margin: 50px 0 0 200px; /* Отступ справа от кнопки выхода */
     background: none;
     border: none;
     cursor: pointer;

@@ -5,7 +5,7 @@
       <img class="slider-img" src="/images/banner2.png" />
       <img class="slider-img" src="/images/banner3.png" />
     </div>
-    <div class="popular">ПОПУЛЯРНЫЕ ТОВАРЫ</div>
+    <div class="popular"> ТОВАРЫ</div>
     <div class="product">
       <div class="product1">
         <div class="photo">

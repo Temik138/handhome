@@ -1,113 +1,210 @@
+<template>
+  <div class="auth-page">
+    <AppHeader />
+    <section class="auth-section">
+      <div class="auth-card">
+        <h2 class="auth-title">Регистрация</h2>
+
+        <form @submit.prevent="submit">
+          <div class="form-group">
+            <label for="name" class="form-label">Имя</label>
+            <input
+              id="name"
+              type="text"
+              class="form-input"
+              v-model="form.name"
+              required
+              autofocus
+              autocomplete="name"
+              placeholder="Имя"
+            />
+            <div v-if="form.errors.name" class="error-message">{{ form.errors.name }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Электронная почта</label>
+            <input
+              id="email"
+              type="email"
+              class="form-input"
+              v-model="form.email"
+              required
+              autocomplete="username"
+              placeholder="Электронная почта"
+            />
+            <div v-if="form.errors.email" class="error-message">{{ form.errors.email }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="form-label">Номер телефона</label>
+            <input
+              id="phone"
+              type="tel"
+              class="form-input"
+              v-model="form.phone"
+              autocomplete="tel"
+              placeholder="Номер телефона"
+            />
+            <div v-if="form.errors.phone" class="error-message">{{ form.errors.phone }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Пароль</label>
+            <input
+              id="password"
+              type="password"
+              class="form-input"
+              v-model="form.password"
+              required
+              autocomplete="new-password"
+              placeholder="Пароль"
+            />
+            <div v-if="form.errors.password" class="error-message">{{ form.errors.password }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="password_confirmation" class="form-label">Подтвердите пароль</label>
+            <input
+              id="password_confirmation"
+              type="password"
+              class="form-input"
+              v-model="form.password_confirmation"
+              required
+              autocomplete="new-password"
+              placeholder="Подтвердите пароль"
+            />
+            <div v-if="form.errors.password_confirmation" class="error-message">{{ form.errors.password_confirmation }}</div>
+          </div>
+
+          <button type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing" class="auth-button">
+            Зарегистрироваться
+          </button>
+        </form>
+      </div>
+    </section>
+    <AppFooter />
+  </div>
+</template>
+
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import AppHeader from '../Header.vue';
+import AppFooter from '../Footer.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+  name: '',
+  email: '',
+  phone: '', // Добавляем поле для телефона
+  password: '',
+  password_confirmation: '',
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+  form.post(route('register'), {
+    onFinish: () => form.reset('password', 'password_confirmation'),
+  });
 };
 </script>
 
-<template>
-    <GuestLayout>
-        <Head title="Register" />
+<style scoped>
+/* Используйте те же стили, что и для Login.vue */
+.auth-page {
+  background-color: #884535;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="name" value="Name" />
+.auth-section {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
 
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
+.auth-card {
+  background-color: #7a3a2d;
+  border: dashed 2px white;
+  border-radius: 8px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-family: "Montserrat", sans-serif;
+}
 
-                <InputError class="mt-2" :message="form.errors.name" />
-            </div>
+.auth-title {
+  font-size: 32px;
+  color: #ffd700;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+.form-group {
+  margin-bottom: 20px;
+}
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
+.form-label {
+  display: none; /* Скрываем, если используем placeholder */
+}
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: dashed 2px white;
+  border-radius: 5px;
+  background-color: #7a3a2d;
+  color: white;
+  font-size: 16px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+.form-input:focus {
+  border-color: #ffd700;
+  background-color: #884535;
+}
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
+.form-input::placeholder {
+  color: #ccc;
+  text-align: center;
+}
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+.error-message {
+  color: #ffcccc;
+  font-size: 14px;
+  margin-top: 5px;
+  text-align: center;
+}
 
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+.auth-button {
+  display: block;
+  width: fit-content;
+  padding: 12px 30px;
+  margin: 30px auto 0;
+  background-color: transparent;
+  color: white;
+  border: dashed 2px white;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: bold;
+}
 
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
+.auth-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #ffd700;
+  color: #ffd700;
+}
 
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
-            </div>
-
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Register
-                </PrimaryButton>
-            </div>
-        </form>
-    </GuestLayout>
-</template>
+.auth-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

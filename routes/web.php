@@ -18,8 +18,8 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 
 // Маршруты, требующие аутентификации
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard'); 
+    Route::get('/', function () {
+        return Inertia::render('Home'); 
     })->name('dashboard');
     // Пример: Страница профиля (из Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

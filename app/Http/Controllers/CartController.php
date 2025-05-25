@@ -86,7 +86,7 @@ class CartController extends Controller
         // Рассчитываем общую сумму
         $total = collect($cartItems)->sum('item_total');
 
-        return Inertia::render('Cart1', [ // Убедитесь, что 'Cart1' это правильное имя файла компонента
+        return Inertia::render('Cart', [ // Убедитесь, что 'Cart1' это правильное имя файла компонента
             'cartItems' => $cartItems,
             'cartTotal' => $total,
         ]);
